@@ -1,107 +1,94 @@
 /*!Copyright Dave Mackintosh. MIT License. 2013*/
 ;(function (g) {
 	'use strict';
+	
+  function $OM(selector, parent) {
+    this.results = [];
+    this.scope   = parent || document;
 
-	// For easier access later
-	var AP = Array.prototype,
-		EP = Element.prototype,
-		HD = HTMLDocument.prototype;
+    if (helpers.type(selector, 'string')) {
+      this.results = Array.prototype.slice.call(this.scope.querySelectorAll(selector));
+    } else {
+      this.results = [selector];
+    }
 
-	// A super simple selection engine
-	g.$ = function (s, p) {
-		p = p || document;
-		if (type(s, 'string')) {
-			return AP.slice.call(p.querySelectorAll(s));
-		} else {
-			return [s];
-		}
-	};
+    return this;
+  }
 
-	// Remove an element from the DOM
-	EP.remove = function () {
-		this.parentNode.removeChild(this);
-	};
+  var op = $OM.prototype;
 
-	// Set or retrieve data on an object
-	EP.data = function (k, v) {
-		if (type(v, "undefined")) {
-			return this.data(k);
-		} else {
-			this.data(k, v);
-		}
-	};
+  op.get = function(index) {
+    var index = index || 0;
+    return this.results[index];
+  }
 
-	// Return the nodes class List
-	EP.classes = function () {
-		return this.classList ? this.classList : [];
-	}
+  op.on = function(handles, delegated, callback, capture) {
+    // Store the array
+    var array = this.results;
 
-	// Util function for type checking
-	function type(o, e) {
-		var type = (typeof o).toLowerCase();
-		return e ? type === e : type;
-	}
+    // Whether we're capturing or not
+    capture = !helpers.type(capture, 'boolean') && helpers.type(callback, 'boolean') ? callback : capture;
 
-	// Event delegation
-	function delegate(event, selector, callback) {
-		// Get the event and the source of the event
-		event = event || window.event;
-		var target = event.target || event.srcElement;
+    // Loop over the events
+    handles.split(' ').forEach(function (individual_handle) {
+      // Then loop over the elements
+      array.forEach(function (e) {
+        e.addEventListener(individual_handle, function (event) {
+          if (helpers.type(delegated, 'function')) {
+            return delegated.call(this, event);
+          }
 
-		// If we don't have a selector, just callback
-		if (!type(selector, 'string')) {
-			return callback(event);
-		}
+          return delegate(event, delegated, callback);
+        }, capture);
+      });
+    }.bind($OM));
 
-		// If we do have a selector, get the elements
-		$(selector, target.parentNode).each(function () {
-			if (this === target) {
-				callback.call(this, event);
-			}
-		});
-	}
+    return this;
+  };
 
-	// Add an each function to call like jQueries
-	AP.each = function (cb) {
-		this.forEach(function (e) {
-			cb.call(e, e);
-		});
-		return this;
-	};
+  op.off = function(handles, callback, capture) {
+    capture = capture || false;
+    handles.split(' ').forEach(function (individual_handle) {
+      this.results.forEach(function (e) {
+        e.removeEventListener(individual_handle, callback, capture);
+      });
+    }.bind(this));
+    return this;
+  };
 
-	// Add an on method to the array prototype
-	// For simple recursive event listening
-	HD.on = AP.on = function (handles, delegated, callback, capture) {
-		// Store the array
-		var array = this;
+  op.each = function(cb) {
+    this.results.forEach(function (e) {
+      cb.apply(e, arguments);
+    });
+    return this;
+  };
 
-		// Whether we're capturing or not
-		capture = !type(capture, 'boolean') && type(callback, 'boolean') ? callback : capture;
+  op.remove = function() {
+    this.results.forEach(function(e) {
+      e.parentNode.removeChild(e);
+    });
+  };
 
-		// Loop over the events
-		handles.split(' ').forEach(function (individual_handle) {
-			// Then loop over the elements
-			array.each(function (e) {
-				e.addEventListener(individual_handle, function (event) {
-					if (type(delegated, 'function')) {
-						return delegated.call(this, event);
-					}
+  function delegate(event, selector, callback) {
+    // Get the event and the source of the event
+    event = event || window.event;
+    var target = event.target || event.srcElement;
 
-					return delegate(event, delegated, callback);
-				}, capture);
-			});
-		});
-		return this;
-	};
+    // If we don't have a selector, just callback
+    if (!helpers.type(selector, 'string')) {
+      return callback(event);
+    }
 
-	// Add an off method to the array prototype
-	// To remove event listeners
-	HD.off = AP.off = function (handle, callback, capture) {
-		capture = capture || false;
-		this.each(function (e) {
-			e.removeEventListener(handle, callback, capture);
-		});
-		return this;
-	};
+    // If we do have a selector, get the elements
+    new $OM(selector, target.parentNode).each(function () {
+      if (this === target) {
+        callback.call(this, event);
+      }
+    });
+  }
+
+  g.$ = function (s, p) {
+    return new $OM(s, p);
+  };
 
 })(this);
