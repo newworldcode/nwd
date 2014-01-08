@@ -1,6 +1,6 @@
 /*!Copyright Dave Mackintosh. MIT License. 2013*/
 ;(function (g) {
-	'use strict';
+  'use strict';
 	
   function $OM(selector, parent) {
     this.results = [];
