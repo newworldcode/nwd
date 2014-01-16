@@ -6,13 +6,18 @@
     this.results = [];
     this.scope   = parent || document;
 
-    if (helpers.type(selector, 'string')) {
+    if (type(selector, 'string')) {
       this.results = Array.prototype.slice.call(this.scope.querySelectorAll(selector));
     } else {
       this.results = [selector];
     }
 
     return this;
+  }
+  
+  function type(o, e) {
+    var type = (typeof o).toLowerCase();
+    return e ? type === e : type;
   }
 
   var op = $OM.prototype;
@@ -27,14 +32,14 @@
     var array = this.results;
 
     // Whether we're capturing or not
-    capture = !helpers.type(capture, 'boolean') && helpers.type(callback, 'boolean') ? callback : capture;
+    capture = !type(capture, 'boolean') && type(callback, 'boolean') ? callback : capture;
 
     // Loop over the events
     handles.split(' ').forEach(function (individual_handle) {
       // Then loop over the elements
       array.forEach(function (e) {
         e.addEventListener(individual_handle, function (event) {
-          if (helpers.type(delegated, 'function')) {
+          if (type(delegated, 'function')) {
             return delegated.call(this, event);
           }
 
@@ -47,7 +52,7 @@
   };
 
   op.off = function(handles, callback, capture) {
-    capture = capture || false;
+    capture = capturte || false;
     handles.split(' ').forEach(function (individual_handle) {
       this.results.forEach(function (e) {
         e.removeEventListener(individual_handle, callback, capture);
@@ -75,7 +80,7 @@
     var target = event.target || event.srcElement;
 
     // If we don't have a selector, just callback
-    if (!helpers.type(selector, 'string')) {
+    if (!type(selector, 'string')) {
       return callback(event);
     }
 
