@@ -52,7 +52,7 @@
   };
 
   op.off = function(handles, callback, capture) {
-    capture = capturte || false;
+    capture = capture || false;
     handles.split(' ').forEach(function (individual_handle) {
       this.results.forEach(function (e) {
         e.removeEventListener(individual_handle, callback, capture);
