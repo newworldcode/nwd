@@ -1,5 +1,5 @@
 #NWD
-A VERY small, simple, fast and modern dom query helper.  
+New World DOM is a very small, simple, fast and modern dom query helper.  
 
 ```js
 $('a').each(function (link) {
