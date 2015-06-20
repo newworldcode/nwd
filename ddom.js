@@ -1,7 +1,7 @@
-/*!Copyright Dave Mackintosh. MIT License. 2013*/
-;(function (g) {
-  'use strict';
-  
+/*! Copyright New World Code. MIT License. 2013-2015 */
+(function (g) {
+  'use strict'
+
   /**
    * Main construct
    * @param  {string|Element} selector Valid selector string
@@ -9,19 +9,30 @@
    * @return {$OM}
    */
   function $OM(selector, parent) {
-    this.results = [];
-    this.scope   = parent || document;
+    this.results = []
+    this.scope   = parent || document
 
     // Different behaviour for selector and Element
-    if (type(selector, 'string')) {
-      this.results = Array.prototype.slice.call(this.scope.querySelectorAll(selector));
-    } else {
-      this.results = [selector];
-    }
+    if (type(selector, 'string'))
+      this.results = [].slice.call(this.scope.querySelectorAll(selector))
+    else
+      this.results = [selector]
 
-    return this;
+    return this
   }
-  
+
+  // Shorten the call.
+  var op = $OM.prototype
+
+  // Add a getter for length for checking results of the selector.
+  Object.defineProperty(op, "length", {
+    __proto__: null,
+    enumerable: true,
+    get: function lengthGetter() {
+      return this.results.length
+    }
+  })
+
   /**
    * Check the type of something
    * @param  {any} ofThis The thing to check typeof
@@ -29,20 +40,17 @@
    * @return {Bool|String} boolean of match or the typeof
    */
   function type(ofThis, equals) {
-    var type = (typeof ofThis).toLowerCase();
-    return equals ? type === equals : type;
+    var type = (typeof ofThis).toLowerCase()
+    return equals ? type === equals : type
   }
-
-  // Shorten the call.
-  var op = $OM.prototype;
 
   /**
    * Get one of the results at an index
    * @param  {Number} index Index to fetch at
    * @return {Element|null}
    */
-  op.get = function(index) {
-    return this.results[index || 0];
+  op.get = function get(index) {
+    return this.results[index || 0]
   }
 
   /**
@@ -55,29 +63,28 @@
    * @param  {Boolean}  capture   Whether to capture the event.
    * @return {$OM}
    */
-  op.on = function(handles, delegated, callback, capture) {
+  op.on = function on(handles, delegated, callback, capture) {
     // Store the array
-    var array = this.results;
+    var array = this.results
 
     // Whether we're capturing or not
-    capture = !type(capture, 'boolean') && type(callback, 'boolean') ? callback : capture;
+    capture = !type(capture, 'boolean') && type(callback, 'boolean') ? callback : capture
 
     // Loop over the events
-    handles.split(' ').forEach(function (individual_handle) {
+    handles.split(' ').forEach(function eventHandleLoop(individual_handle) {
       // Then loop over the elements
-      array.forEach(function (e) {
-        e.addEventListener(individual_handle, function (event) {
-          if (type(delegated, 'function')) {
-            return delegated.call(this, event);
-          }
+      array.forEach(function resultsLoop(e) {
+        e.addEventListener(individual_handle, function eventHandleRegister(event) {
+          if (type(delegated, 'function'))
+            delegated.call(event.target, event)
+          else
+            delegate(event, delegated, callback)
+        }, capture)
+      })
+    }.bind(this))
 
-          return delegate(event, delegated, callback);
-        }, capture);
-      });
-    }.bind(this));
-
-    return this;
-  };
+    return this
+  }
 
   /**
    * Unsubscribe from a series of events.
@@ -86,27 +93,40 @@
    * @param  {Capture}  capture  Whether to capture the event.
    * @return {$OM}
    */
-  op.off = function(handles, callback, capture) {
-    capture = capture || false;
-    handles.split(' ').forEach(function (individual_handle) {
-      this.results.forEach(function (e) {
-        e.removeEventListener(individual_handle, callback, capture);
-      });
-    }.bind(this));
-    return this;
-  };
+  op.off = function off(handles, callback, capture) {
+    capture = capture || false
+    handles.split(' ').forEach(function eventHandleLoop(individual_handle) {
+      this.results.forEach(function resultsLoop(e) {
+        e.removeEventListener(individual_handle, callback, capture)
+      })
+    }.bind(this))
+    return this
+  }
+
+  /**
+   * Return a wrapped parentNode of the first element in our results list,
+   * or return null.
+   *
+   * @return {$OM}
+   */
+  op.parent = function parent() {
+    if (this.results.length > 0)
+      return new $OM(this.results[0].parentNode)
+    else
+      return null
+  }
 
   /**
    * Loop over the last known set of results from a selector.
    * @param  {Function} cb Callback for each element.
    * @return {$OM}
    */
-  op.each = function(cb) {
-    this.results.forEach(function (e) {
-      cb.apply(e, arguments);
-    });
-    return this;
-  };
+  op.each = function each(cb) {
+    this.results.forEach(function eachForEach(e) {
+      cb.apply(e, arguments)
+    })
+    return this
+  }
 
   /**
    * The on method uses this private method to delegate events
@@ -117,20 +137,18 @@
    */
   function delegate(event, selector, callback) {
     // Get the event and the source of the event
-    event = event || window.event;
-    var target = event.target || event.srcElement;
+    event = event || window.event
+    var target = event.target || event.srcElement
 
     // If we don't have a selector, just callback
-    if (!type(selector, 'string')) {
-      return callback(event);
-    }
+    if (!type(selector, 'string')) return callback(event)
 
     // If we do have a selector, get the elements
-    new $OM(selector, target.parentNode).each(function () {
-      if (this === target) {
-        callback.call(this, event);
-      }
-    });
+    new $OM(selector, target.parentNode).each(function scopedDelegateLoop() {
+      if (this === target) callback.call(this, event)
+    })
+
+    return this
   }
 
   /**
@@ -140,7 +158,7 @@
    * @return {$OM}
    */
   g.$ = function (s, p) {
-    return new $OM(s, p);
-  };
+    return new $OM(s, p)
+  }
 
-})(this);
+})(window)
