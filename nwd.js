@@ -1,4 +1,4 @@
-/*! Copyright New World Code. MIT License. 2013-2015 */
+/*!Copyright New World Code. MIT License. 2013*/
 (function (g) {
   'use strict'
 
@@ -21,6 +21,17 @@
     return this
   }
 
+  /**
+   * Check the type of something
+   * @param  {any} ofThis The thing to check typeof
+   * @param  {any} equals Is the type equal to this?
+   * @return {Bool|String} boolean of match or the typeof
+   */
+  function type(ofThis, equals) {
+    var type = (typeof ofThis).toLowerCase()
+    return equals ? type === equals : type
+  }
+
   // Shorten the call.
   var op = $OM.prototype
 
@@ -34,14 +45,16 @@
   })
 
   /**
-   * Check the type of something
-   * @param  {any} ofThis The thing to check typeof
-   * @param  {any} equals Is the type equal to this?
-   * @return {Bool|String} boolean of match or the typeof
+   * When the document is ready to be transformed,
+   * fire this callback. Only happens once.
+   *
+   * @param  {Function} callback
+   * @return {$OM}
    */
-  function type(ofThis, equals) {
-    var type = (typeof ofThis).toLowerCase()
-    return equals ? type === equals : type
+  op.ready = function documentReady(callback) {
+    document.addEventListener('DOMContentLoaded', callback)
+
+    return this
   }
 
   /**
@@ -51,6 +64,24 @@
    */
   op.get = function get(index) {
     return this.results[index || 0]
+  }
+
+  /**
+   * Append a node to the ones in scope.
+   * @param  {Element} node to append
+   * @return {$OM}
+   */
+  op.append = function append(node) {
+    this.results.forEach(function appendEach(selected_node) {
+      if (node instanceof $OM)
+        node.each(function innerAppendEach(inner_node) {
+          selected_node.appendChild(inner_node)
+        })
+      else
+        selected_node.appendChild(node)
+    })
+
+    return this
   }
 
   /**
@@ -106,7 +137,6 @@
   /**
    * Return a wrapped parentNode of the first element in our results list,
    * or return null.
-   *
    * @return {$OM}
    */
   op.parent = function parent() {
@@ -117,12 +147,39 @@
   }
 
   /**
+   * Get the list of classes on a node.
+   * @return {TokenList|null}
+   */
+  op.classes = function() {
+    if (this.results.length > 1)
+      return this.results.map(function classesResultsMap(result) {
+        return result.classList
+      })
+    else if (this.results.length === 0)
+      return null
+    else
+      return this.results[0].classList
+  }
+
+  /**
    * Loop over the last known set of results from a selector.
    * @param  {Function} cb Callback for each element.
    * @return {$OM}
    */
   op.each = function each(cb) {
     this.results.forEach(function eachForEach(e) {
+      cb.apply(e, arguments)
+    })
+    return this
+  }
+
+  /**
+   * Filter a result set.
+   * @param  {Function} cb Callback for each element.
+   * @return {$OM}
+   */
+  op.filter = function filter(cb) {
+    this.results.filter(function eachFilter(e) {
       cb.apply(e, arguments)
     })
     return this
