@@ -1,6 +1,6 @@
 {
   "name": "nwdom",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Small, fast and modern DOM helper",
   "main": "nwd.js",
   "scripts": {
