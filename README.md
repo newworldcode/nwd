@@ -1,5 +1,11 @@
 #NWD
-New World DOM is a very small, simple, fast and modern dom query helper.  
+New World DOM is a very small, simple, fast and modern dom query helper.
+
+```
+npm i --save nwdom
+OR
+bower install nwd
+```
 
 ```js
 $('a').each(function (link) {
