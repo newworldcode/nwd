@@ -1,5 +1,5 @@
 {
-  "name": "nwd",
+  "name": "nwdom",
   "version": "1.0.0",
   "description": "Small, fast and modern DOM helper",
   "main": "nwd.js",
