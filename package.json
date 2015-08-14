@@ -1,0 +1,23 @@
+{
+  "name": "nwd",
+  "version": "1.0.0",
+  "description": "Small, fast and modern DOM helper",
+  "main": "nwd.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/newworldcode/nwd.git"
+  },
+  "keywords": [
+    "DOM",
+    "selector"
+  ],
+  "author": "davemackintosh <me@davemackintosh.co.uk>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/newworldcode/nwd/issues"
+  },
+  "homepage": "https://github.com/newworldcode/nwd#readme"
+}

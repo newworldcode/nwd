@@ -6,11 +6,11 @@ $('a').each(function (link) {
   // `this` and `link` are the same thing
 })
 ```
-    
+
 It also supports event delegation  
 
 ```js
-$('body').on('click', 'button', function (event) {
+$('body').on('mousedown mouseup', 'button', function (event) {
   console.log('A button got pressed!', this, event)
 })
 ```
@@ -18,10 +18,10 @@ $('body').on('click', 'button', function (event) {
 A result set from `$('selector')` has a virtual length property so `$('p').length > 0` will function as usual.  
 
 #### `$('selector').on(eventName, [delegate], callback)`  
-Add listeners to any elements with support for event delegation.
+Add listeners to any elements with support for event delegation. Subscribe to multiple events by space delimiting the event names.
 
 #### `$('selector').off(eventName, callback)`  
-Remove listeners from any elements.
+Remove listeners from any elements. Unsubscribe from multiple events by space delimiting the event names.
 
 #### `$('selector').get(index)`  
 Get a specific node from a set of results or undefined for out of bounds.

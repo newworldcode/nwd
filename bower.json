@@ -1,0 +1,25 @@
+{
+  "name": "nwd",
+  "main": "nwd.js",
+  "version": "1.0.0",
+  "homepage": "https://github.com/newworldcode/nwd",
+  "authors": [
+    "davemackintosh <me@davemackintosh.co.uk>"
+  ],
+  "description": "Small, fast and modern DOM helper",
+  "moduleType": [
+    "amd"
+  ],
+  "keywords": [
+    "dom",
+    "selector"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
